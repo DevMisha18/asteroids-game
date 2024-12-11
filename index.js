@@ -17,6 +17,7 @@ function setupCanvas() {
   // Check for entered keys
   document.body.addEventListener('keydown', function(e) {
     keys[e.key] = true;
+    // console.log(keys);
   });
   document.body.addEventListener('keyup', function(e) {
     keys[e.key] = false;
@@ -34,7 +35,7 @@ class Ship {
     this.speed = 0.1;
     this.velX = 0;
     this.velY = 0;
-    this.rotateSpeed = 0.001;
+    this.rotateSpeed = 1;
     this.radius = 15; // Ship radius
     this.angle = 0;
     this.strokeColor = 'white';
@@ -48,6 +49,7 @@ class Ship {
   update() {
     // converting degrees to radians
     const radians = this.angle * (Math.PI / 180);
+    // const radians = this.angle / (Math.PI * 180);
     if (this.movingForward) {
       this.velX += Math.cos(radians) * this.speed;
       this.velY += Math.sin(radians) * this.speed;
@@ -56,7 +58,7 @@ class Ship {
     // Ship beyond screen
     if (this.x < this.radius)
       this.x = canvas.width;
-    if (this.x > this.canvas.width)
+    if (this.x > canvas.width)
       this.x = this.radius;
     if (this.y < this.radius)
       this.y = canvas.height;
@@ -72,21 +74,34 @@ class Ship {
     this.y -= this.velY;
   }
 
-  Draw() {
-    ctx.strokeColor = this.strokeColor;
+  draw() {
+    ctx.strokeStyle = this.strokeColor;
     ctx.beginPath();
-    let vertAngle = ((Math.PI / 2) / 3);
+    let vertAngle = (Math.PI * 2) / 3;
     const radians = this.angle * (Math.PI / 180);
+    // const radians = this.angle / (Math.PI * 180);
     for (let i = 0; i < 3; i++) {
-      ctx.lineTo(this.x - this.radius * Math.cos(i*vertAngle + radians),
-                 this.y - this.radius * Math.sin(i*vertAngle + radians));
+      const x = this.x - this.radius * Math.cos(i*vertAngle + radians);
+      const y = this.y - this.radius * Math.sin(i*vertAngle + radians);
+      // console.log(x, y)
+      ctx.lineTo(x, y);
     }
+    // console.log("_____________")
     ctx.closePath();
     ctx.stroke();
   }
 }
 
 
+const ship = new Ship();
 function render() {
-
+  ship.movingForward = keys['w'];
+  if (keys['d'])
+    ship.Rotate(1);
+  if (keys['a'])
+    ship.Rotate(-1);
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ship.update()
+  ship.draw();
+  requestAnimationFrame(render);
 }
